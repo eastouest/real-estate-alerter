@@ -3,7 +3,7 @@
 ---
 
 ## Project Overview
-The **Real Estate Transaction Analyzer** is a Streamlit-based tool designed to streamline the process of reviewing and labeling real estate transactions for newsworthiness. Developed as part of the **[JournalismAI Fellowship](https://www.journalismai.info/programmes/fellowship)**, this tool empowers journalists and analysts to interact with machine learning output, refine predictions, and feed labeled data back into BigQuery.
+The **Real Estate Transaction Analyzer** is a Streamlit-based tool designed to streamline the process of reviewing and labeling real estate transactions for newsworthiness. Developed as part of the **[JournalismAI Fellowship](https://www.journalismai.info/programmes/fellowship)** in collaboration with the Globe & Mail, Hearst, Gannett and E24, this tool empowers journalists and analysts to interact with machine learning output, refine predictions, and feed labeled data back into BigQuery.
 
 ---
 
