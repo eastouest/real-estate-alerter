@@ -168,7 +168,7 @@ def main():
             st.header("Transaction Overview")
             
             # Filters
-            col1, col2, col3 = st.columns(3)
+            col1, col2, col3, col4 = st.columns(4)
             with col1:
                 district_filter = st.multiselect(
                     "Filter by District",
@@ -180,6 +180,11 @@ def main():
                     options=sorted(df['property_building_type_category'].unique())
                 )
             with col3:
+                date_filter = st.multiselect(
+                    "Date created",
+                    options=sorted(df['created_date'].astype(str).unique())  # Convert to string for compatibility
+                )
+            with col4:
                 price_range = st.slider(
                     "Price Range (NOK)",
                     min_value=int(df['transaction_sum'].min()),
@@ -193,11 +198,13 @@ def main():
                 filtered_df = filtered_df[filtered_df['property_district'].isin(district_filter)]
             if type_filter:
                 filtered_df = filtered_df[filtered_df['property_building_type_category'].isin(type_filter)]
+            if date_filter:
+                filtered_df = filtered_df[filtered_df['created_date'].astype(str).isin(date_filter)]  # Filter using string dates
             filtered_df = filtered_df[
                 (filtered_df['transaction_sum'] >= price_range[0]) & 
                 (filtered_df['transaction_sum'] <= price_range[1])
             ]
-
+            
             # Display interactive dataframe with action buttons
             st.dataframe(
                 filtered_df[[
