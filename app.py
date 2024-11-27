@@ -35,8 +35,7 @@ def load_and_process_bigquery_data(project_id="real-estate-alerter"):
         CAST(JSON_EXTRACT_SCALAR(property_details, "$.property_number_of_rooms") AS INT64) AS property_number_of_rooms,
         CAST(JSON_EXTRACT_SCALAR(property_details, "$.building_footprint") AS FLOAT64) AS building_footprint,
         JSON_EXTRACT_SCALAR(property_details, "$.built_year") AS built_year,
-        -- Use REGEXP_CONTAINS to identify celebrity mentions in property_details
-        REGEXP_CONTAINS(property_description, r'(?i)(celebrity|famous|notable|VIP)') AS has_celebrity
+        JSON_EXTRACT_SCALAR(property_details, "$.is_famous") AS has_celebrity,
     FROM `real-estate-alerter.real_estate_alerter_output.newsworthy`
     """
     df = pandas_gbq.read_gbq(query, project_id=project_id)
@@ -282,7 +281,7 @@ def main():
                     st.write(f"**Price:** {property_data['transaction_sum']:,.0f} NOK")
                     st.write(f"**Price per m²:** {property_data['price_per_sqm']:,.0f} NOK")
                     st.write(f"**Transaction Type:** {property_data['transaction_type']}")
-                    st.write(f"**Celebrity Involved:** {'Yes' if property_data['has_celebrity'] else 'No'}")
+                    st.write(f"**Celebrity Involved:** {'Yes' if property_data['has_celebrity'] == '1' else 'No'}")
                 
                 if property_data['property_description']:
                     st.subheader("Property Description")
