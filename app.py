@@ -12,12 +12,12 @@ def clear_cache():
     st.cache_data.clear()
 
 @st.cache_data
-def load_and_process_bigquery_data(project_id="real-estate-alerter"):
+def load_and_process_bigquery_data(table_name, project_id="real-estate-alerter"):
     """
     Load data from BigQuery and preprocess it for filtering and feedback.
     """
-    query = """
-   SELECT 
+    query = f"""
+    SELECT 
         newsworthy_alert,
         transaction_id,
         property_description,
@@ -35,8 +35,8 @@ def load_and_process_bigquery_data(project_id="real-estate-alerter"):
         CAST(JSON_EXTRACT_SCALAR(property_details, "$.property_number_of_rooms") AS INT64) AS property_number_of_rooms,
         CAST(JSON_EXTRACT_SCALAR(property_details, "$.building_footprint") AS FLOAT64) AS building_footprint,
         JSON_EXTRACT_SCALAR(property_details, "$.built_year") AS built_year,
-        JSON_EXTRACT_SCALAR(property_details, "$.is_famous") AS has_celebrity,
-    FROM `real-estate-alerter.real_estate_alerter_output.newsworthy`
+        JSON_EXTRACT_SCALAR(property_details, "$.is_famous") AS has_celebrity
+    FROM `{project_id}.real_estate_alerter_output.{table_name}`
     """
     df = pandas_gbq.read_gbq(query, project_id=project_id)
     df['created_date'] = pd.to_datetime(df['created_date']).dt.date  # Ensure created_date is parsed as a date
@@ -130,10 +130,16 @@ def main():
     if 'last_clicked_index' not in st.session_state:
         st.session_state['last_clicked_index'] = None
     if 'df' not in st.session_state:
-        # Load data from BigQuery as default
-        st.session_state['df'] = load_and_process_bigquery_data()
+        st.session_state['df'] = None
 
     st.title("Real Estate Transaction Analyzer 🏠")
+    
+    # Sidebar: Table toggle
+    st.sidebar.subheader("View Options")
+    table_option = st.sidebar.radio(
+        "Select table to view:",
+        options=["Newsworthy", "Non-Newsworthy"]
+    )
     
     # File uploader in sidebar
     with st.sidebar:
@@ -149,6 +155,16 @@ def main():
                 st.success("✅ File uploaded and processed successfully!")
             except Exception as e:
                 st.error(f"Error processing file: {str(e)}")
+                
+    # Determine table name based on selection
+    table_name = "newsworthy" if table_option == "Newsworthy" else "non_newsworthy"
+
+    # Load data based on selected table
+    if st.session_state['df'] is None or st.session_state.get('current_table') != table_name:
+        st.session_state['df'] = load_and_process_bigquery_data(table_name, project_id="real-estate-alerter")
+        st.session_state['current_table'] = table_name
+
+    df = st.session_state['df']
 
     # Use preloaded BigQuery data if no CSV is uploaded
     df = st.session_state.get('df')
