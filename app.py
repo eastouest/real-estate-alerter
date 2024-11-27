@@ -204,7 +204,7 @@ def main():
                 (filtered_df['transaction_sum'] >= price_range[0]) & 
                 (filtered_df['transaction_sum'] <= price_range[1])
             ]
-            
+
             # Display interactive dataframe with action buttons
             st.dataframe(
                 filtered_df[[
@@ -292,11 +292,41 @@ def main():
                 
                 if property_data['property_description']:
                     st.subheader("Property Description")
-                    st.write(property_data['property_description']) 
+                    
+                    description = property_data['property_description']
+                    
+                    if "Additional details about the property" in description:
+                        # Extract the section starting with "Additional details about the property"
+                        import re
+                        match = re.search(r"Additional details about the property: (.*)", description)
+                        if match:
+                            details = match.group(1)  # Capture everything after the colon
+                            # Split into key-value pairs and format each pair on a new line
+                            details_lines = details.split(" ")
+                            formatted_details = ""
+                            for line in details_lines:
+                                if ":" in line:
+                                    key, value = line.split(":", 1)  # Split only on the first colon
+                                    formatted_details += f"**{key.strip()}**: {value.strip()}\n"
+                                else:
+                                    formatted_details += f"{line.strip()}\n"
+                        else:
+                            formatted_details = ""
+
+                        # Render the main description without the "Additional details" section
+                        main_description = description.split("Additional details about the property")[0]
+                        st.write(main_description)
+
+                        # Render the "Additional details" as a separate block
+                        st.markdown(f"### Additional Details\n{formatted_details}")
+                    else:
+                        # If no additional details are present, render the whole description normally
+                        st.write(description)
+
 
                 if property_data['newsworthy_alert']:
-                    st.warning("**Newsworthy Alert:**")
-                    st.write(property_data['newsworthy_alert'])
+                    st.warning(f"**Newsworthy Alert:** {property_data['newsworthy_alert']}")
+
                 
                 # Feedback section
                 st.subheader("Provide Feedback")
