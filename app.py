@@ -229,10 +229,10 @@ def main():
                 filtered_df[[
                     'newsworthy_alert',
                     'property_district',
+                    'has_celebrity',
                     'price_per_sqm',
                     'transaction_sum',
                     'property_building_type_category',
-                    'has_celebrity',
                     'property_area',
                     'transaction_type'
                 ]].style.format({
@@ -248,6 +248,10 @@ def main():
                     ),
                     "property_district": st.column_config.TextColumn(
                         "District",
+                        width="small"
+                    ),
+                    "has_celebrity": st.column_config.TextColumn(
+                        "Celebrity",
                         width="medium"
                     ),
                     "price_per_sqm": st.column_config.NumberColumn(
@@ -263,10 +267,6 @@ def main():
                     "property_building_type_category": st.column_config.TextColumn(
                         "Type",
                         width="medium"
-                    ),
-                    "has_celebrity": st.column_config.TextColumn(
-                        "Celebrity",
-                        width="small"
                     ),
                     "property_area": st.column_config.NumberColumn(
                         "Area (m²)",
