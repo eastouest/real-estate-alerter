@@ -155,7 +155,7 @@ def main():
                 st.success("✅ File uploaded and processed successfully!")
             except Exception as e:
                 st.error(f"Error processing file: {str(e)}")
-                
+
     # Determine table name based on selection
     table_name = "newsworthy" if table_option == "Newsworthy" else "non_newsworthy"
 
@@ -179,7 +179,10 @@ def main():
 
     if st.session_state['df'] is not None:
         df = st.session_state['df']
-        
+        # Preprocess DataFrame to cast 0 to "No" and any other non-zero value to "Yes" in the 'has_celebrity' column
+        if 'has_celebrity' in df.columns:
+            df['has_celebrity'] = df['has_celebrity'].apply(lambda x: "No" if x == '0' else x)
+
         with tab1:
             st.header("Transaction Overview")
             
@@ -229,6 +232,7 @@ def main():
                     'price_per_sqm',
                     'transaction_sum',
                     'property_building_type_category',
+                    'has_celebrity',
                     'property_area',
                     'transaction_type'
                 ]].style.format({
@@ -259,6 +263,10 @@ def main():
                     "property_building_type_category": st.column_config.TextColumn(
                         "Type",
                         width="medium"
+                    ),
+                    "has_celebrity": st.column_config.TextColumn(
+                        "Celebrity",
+                        width="small"
                     ),
                     "property_area": st.column_config.NumberColumn(
                         "Area (m²)",
@@ -304,7 +312,7 @@ def main():
                     st.write(f"**Price:** {property_data['transaction_sum']:,.0f} NOK")
                     st.write(f"**Price per m²:** {property_data['price_per_sqm']:,.0f} NOK")
                     st.write(f"**Transaction Type:** {property_data['transaction_type']}")
-                    st.write(f"**Celebrity Involved:** {'Yes' if property_data['has_celebrity'] == '1' else 'No'}")
+                    st.write(f"**Celebrity Involved:** {'No' if property_data['has_celebrity'] == '0' else 'Yes'}")
                 
                 if property_data['property_description']:
                     st.subheader("Property Description")
